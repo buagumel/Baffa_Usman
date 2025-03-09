@@ -1,33 +1,33 @@
-<?php
-  if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    die("Method Not Allowed");
-}
+const express = require("express");
+const nodemailer = require("nodemailer");
 
-require_once '../assets/vendor/php-email-form/php-email-form.php';
+const app = express();
+app.use(express.json());
 
-// Replace with your real receiving email address
-$receiving_email_address = 'buagumel@gmail.com';
+app.post("/contact", async (req, res) => {
+  const { name, email, subject, message } = req.body;
 
-$contact = new PHP_Email_Form;
-$contact->ajax = true;
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "baffausman247@gmail.com",
+      pass: "kepuzsuvuhhveweb",
+    },
+  });
 
-$contact->to = $receiving_email_address;
-$contact->from_name = $_POST['name'];
-$contact->from_email = $_POST['email'];
-$contact->subject = $_POST['subject'];
+  let mailOptions = {
+    from: email,
+    to: "buagumel@gmail.com",
+    subject: subject,
+    text: `From: ${name}\nEmail: ${email}\nMessage: ${message}`,
+  };
 
-// Use SMTP (Requires App Password for Gmail)
-$contact->smtp = array(
-    'host' => 'smtp.gmail.com',
-    'username' => 'baffausman247@gmail.com',
-    'password' => 'kepuzsuvuhhveweb', // Replace with a Gmail App Password
-    'port' => '587'
-);
+  try {
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true, message: "Email sent successfully!" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
-$contact->add_message($_POST['name'], 'From');
-$contact->add_message($_POST['email'], 'Email');
-$contact->add_message($_POST['message'], 'Message', 10);
-
-echo $contact->send();
-?>
+app.listen(3000, () => console.log("Server running on port 3000"));
