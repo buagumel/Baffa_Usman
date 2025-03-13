@@ -46,7 +46,7 @@ app.post("/contact-me", async (req, res) => {
         from: `"${name}" <${email}>`, 
         to: process.env.USER_MAIL,
         subject: subject,
-        html: `<h3> ${message} \n Clients Email: ${email}</h3>` 
+        html: `<h2>Name: </h2>${name}  \n <h2>Message: </h2>  <p> ${message} </p> \n <h2> Email: </h2> ${email}` 
         
     };
     
