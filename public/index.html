@@ -525,7 +525,7 @@
         <div class="row gy-4">
 
                    <div class="col-lg-10">
-            <form action="contact-me" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200">
+            <form action="/contact-me" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="200" id="contactForm">
               <div class="row gy-4">
 
                 <div class="col-md-6">
@@ -597,6 +597,27 @@
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
+  <script>
+    document.getElementById("contactForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent form from reloading page
+    
+        const formData = {
+            name: document.getElementById("name-field").value,
+            email: document.getElementById("email-field").value,
+            subject: document.getElementById("subject-field").value,
+            message: document.getElementById("message-field").value
+        };
+    
+        fetch("/contact-me", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        })
+        .then(res => res.text())
+        .then(data => console.log(data))
+        .catch(err => console.error(err));
+    });
+    </script>
 
 </body>
 

@@ -11,7 +11,7 @@ env.config();
 
 
 
-
+app.use(express.json());
   app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -25,13 +25,10 @@ app.get("/", (req, res)=>{
 });
 
 
-app.post("/contact-me", async (req, res)=>{
-    const name = req.body.name;
-    const email = req.body.email;
-    const subject = req.body.subject;
-    const message = req.body.message;
-
-   
+app.post("/contact-me", async (req, res) => {
+    const { name, email, subject, message } = req.body;
+  
+    console.log(req.body);
 
     const transporter = createTransport({
         service: "gmail",
