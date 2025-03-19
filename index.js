@@ -80,7 +80,9 @@ app.post("/contact-me", async (req, res) => {
 
 
 
-
+app.post("/contact-me", (req, res) => {
+    res.json({ message: "Message received!" });
+  });
 
 app.listen(port, ()=>{
     console.log(`Server running at ${port}...`);
