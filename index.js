@@ -1,15 +1,15 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { createTransport } from "nodemailer";
+import nodemailer from "nodemailer";
 import env from "dotenv";
 
 
-
+ 
 const app = express();
 const port = process.env.PORT || 3000 || 4000;
 env.config();
 
-
+ 
 
 app.use(express.json());
   app.use(bodyParser.json());
@@ -25,65 +25,64 @@ app.get("/", (req, res)=>{
 });
 
 
-app.post("/contact-me", async (req, res) => {
-    const { name, email, subject, message } = req.body;
-  
-    console.log(req.body);
 
-    const transporter = createTransport({
-        service: "gmail",
+
+
+
+
+
+
+
+
+
+
+app.post("/contact-me", async (req, res) => {
+  const { name, email, subject, message } = req.body;
+
+  console.log(req.body);
+
+  if (!name || !email || !subject || !message) {
+      return res.status(400).json({ message: "All fields are required." });
+  }
+
+  const transporter = nodemailer.createTransport({
+      service: "gmail",
       host: "smtp.gmail.com",
       port: 587,
-      secure: false, // true for port 465, false for other ports
+      secure: false,
       auth: {
-        user: process.env.G_USER,
-        pass: process.env.G_PASSWORD,
+          user: process.env.G_USER,
+          pass: process.env.G_PASSWORD,
       },
-    });
-    
-    
-    const mailOptions = {
-        from: `"${name}" <${email}>`, 
-        to: process.env.USER_MAIL,
-        subject: subject,
-        html: `<h2>Name: </h2>${name} <h2>Message: </h2>  <p> ${message} </p> <h2> Email: </h2> ${email}` 
-        
-    };
-    
-    
-    const sendMail = async (transporter, mailOptions)=>{
-        try {
-    
-            await transporter.sendMail(mailOptions);
-
-            console.log("Mail sent successfully!");
-            res.status(200).send('Form submission successful');
-      
-           
-        } catch (error) {
-    
-        console.error(error);
-        res.status(200).send(console.log('Form submission unsuccessful'));
-       
-        }
-    }
-    
-    sendMail(transporter, mailOptions);
-            
-   
-
-
-    
-})
-
-
-
-
-
-app.post("/contact-me", (req, res) => {
-    res.json({ message: "Message received!" });
   });
+
+  const mailOptions = {
+      from: `"${name}" <${email}>`,
+      to: process.env.USER_MAIL,
+      subject: subject,
+      html: `<h4>Name:</h3> ${name} <h4>Message:</h4> <p>${message}</p> <h4>Email:</h4> ${email}`,
+  };
+
+  try {
+      await transporter.sendMail(mailOptions);
+      console.log("Mail sent successfully!");
+
+      return res.status(200).json({ success: true, message: "Your message has been sent successfully!" });
+  } catch (error) {
+      console.error("Error sending email:", error);
+
+      return res.status(500).json({ success: false, message: "Failed to send email. Please try again later." });
+  }
+});
+
+
+
 
 app.listen(port, ()=>{
     console.log(`Server running at ${port}...`);
 });
+
+
+
+
+
